@@ -1,0 +1,56 @@
+grammar uk.ac.lancaster.scc.turtles.stellar.lang.BSPL with org.eclipse.xtext.common.Terminals
+
+generate bSPL "http://www.ac.uk/lancaster/scc/turtles/stellar/lang/BSPL"
+
+// The language is a subset of BSPL which does not include follwing features.
+// - Nested protocols are not supported.
+// - A parameter must always have an adornment.
+// - Parameters in message references cannot be labelled as 'key'.
+
+Specification :
+    protocol = Protocol
+;
+  
+Protocol :
+	name = ID '{' 
+		'role' roles = Roles
+		'parameter' parameters = Parameters
+		references = References
+	'}'
+;
+
+Roles :
+	roles += Role (',' roles += Role)+
+;
+
+Role :
+	name = ID
+;
+
+Parameters :
+	parameters += Parameter (',' parameters += Parameter)*
+;
+
+Parameter :
+	adornment = Adornment name = ID (key ?= 'key')?
+;
+
+References :
+	(references += MessageReference)+
+;
+
+MessageReference :
+	sender = [Role] '->' receiver = [Role] ':' name = ID '[' parameters = ReferenceParameters ']'
+;
+
+ReferenceParameters :
+	referenceParameters += ReferenceParameter (',' referenceParameters += ReferenceParameter)*
+;
+
+ReferenceParameter :
+	adornment = Adornment name = ID
+;
+
+Adornment :
+	'in' | 'out' | 'nil'
+;
